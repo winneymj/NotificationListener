@@ -24,21 +24,21 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
-import learn2crack.notificationlistener.persistence.db.entity.ProductEntity;
+import learn2crack.notificationlistener.persistence.db.entity.NotificationAppsEntity;
 
 @Dao
-public interface ProductDao {
-    @Query("SELECT * FROM products")
-    LiveData<List<ProductEntity>> loadAllProducts();
+public interface NotificationAppsDao {
+    @Query("SELECT * FROM notificationApps")
+    LiveData<List<NotificationAppsEntity>> loadAllProducts();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(List<ProductEntity> products);
+    void insertAll(List<NotificationAppsEntity> apps);
 
-    @Query("select * from products where id = :productId")
-    LiveData<ProductEntity> loadProduct(int productId);
+    @Query("select * from notificationApps where id = :productId")
+    LiveData<NotificationAppsEntity> loadProduct(int productId);
 
-    @Query("select * from products where id = :productId")
-    ProductEntity loadProductSync(int productId);
+    @Query("select * from notificationApps where id = :productId")
+    NotificationAppsEntity loadProductSync(int productId);
 
 //    @Query("SELECT products.* FROM products JOIN productsFts ON (products.id = productsFts.rowid) "
 //            + "WHERE productsFts MATCH :query")

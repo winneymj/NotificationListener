@@ -19,11 +19,16 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import learn2crack.notificationlistener.persistence.db.AppDatabase;
+import learn2crack.notificationlistener.persistence.db.entity.NotificationAppsEntity;
 
 public class OneFragment extends Fragment{
 
     private TableLayout apps;
+    private AppDatabase mDatabase;
 
     public OneFragment() {
         // Required empty public constructor
@@ -31,6 +36,7 @@ public class OneFragment extends Fragment{
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
     }
 
@@ -46,15 +52,22 @@ public class OneFragment extends Fragment{
                              ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_one, container, false);
-        apps = v.findViewById(R.id.tab1);
-
         final Context appContext = getActivity().getApplicationContext();
         final PackageManager pm = appContext.getPackageManager();
+
+        // Get instance of DB
+        mDatabase = AppDatabase.getInstance(appContext);
+
+        View v = inflater.inflate(R.layout.fragment_one, container, false);
+        apps = v.findViewById(R.id.tab1);
 
         Intent intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         List<ResolveInfo> appList = pm.queryIntentActivities(intent, 0);
+
+        // Create list of apps entities to add to the database
+        List<NotificationAppsEntity> notificationApps = new ArrayList<NotificationAppsEntity>();
+        int index = 0;
 
         for (ResolveInfo resolveInfo : appList)
         {
@@ -77,11 +90,16 @@ public class OneFragment extends Fragment{
                 tr.addView(switchView);
                 apps.addView(tr);
 
+                NotificationAppsEntity ent = new NotificationAppsEntity(index++, pName, appInfo.packageName, true);
+                notificationApps.add(ent);
+
             } catch (PackageManager.NameNotFoundException e)
             {
                 e.printStackTrace();
             }
         }
+        // Add apps to DB
+        mDatabase.insertData(notificationApps);
 
         return v;
     }

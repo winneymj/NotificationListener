@@ -16,9 +16,9 @@
 
 package learn2crack.notificationlistener.persistence.db.model;
 
-public interface Product {
+public interface NotificationApps {
     int getId();
-    String getName();
-    String getDescription();
-    int getPrice();
+    String getAppName();
+    String getPackageName();
+    Boolean getEnabled();
 }

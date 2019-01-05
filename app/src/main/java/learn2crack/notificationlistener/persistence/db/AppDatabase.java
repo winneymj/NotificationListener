@@ -26,11 +26,10 @@ import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
 
-import learn2crack.notificationlistener.persistence.db.dao.ProductDao;
-import learn2crack.notificationlistener.persistence.db.entity.ProductEntity;
+import learn2crack.notificationlistener.persistence.db.dao.NotificationAppsDao;
+import learn2crack.notificationlistener.persistence.db.entity.NotificationAppsEntity;
 
-@Database(entities = {ProductEntity.class}, version = 2)
-//@TypeConverters(DateConverter.class)
+@Database(entities = {NotificationAppsEntity.class}, version = 2)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase sInstance;
@@ -38,9 +37,7 @@ public abstract class AppDatabase extends RoomDatabase {
     @VisibleForTesting
     public static final String DATABASE_NAME = "basic-sample-db";
 
-    public abstract ProductDao productDao();
-
-//    public abstract CommentDao commentDao();
+    public abstract NotificationAppsDao notificationApps();
 
     private final MutableLiveData<Boolean> mIsDatabaseCreated = new MutableLiveData<>();
 
@@ -83,6 +80,7 @@ public abstract class AppDatabase extends RoomDatabase {
 //                    }
 //                })
 //                .addMigrations(MIGRATION_1_2)
+                .allowMainThreadQueries() // For now till I use live queries perhaps
                 .build();
     }
 
@@ -99,10 +97,9 @@ public abstract class AppDatabase extends RoomDatabase {
         mIsDatabaseCreated.postValue(true);
     }
 
-    private static void insertData(final AppDatabase database, final List<ProductEntity> products) {
-        database.runInTransaction(() -> {
-            database.productDao().insertAll(products);
-//            database.commentDao().insertAll(comments);
+    public static void insertData(final List<NotificationAppsEntity> apps) {
+        sInstance.runInTransaction(() -> {
+            sInstance.notificationApps().insertAll(apps);
         });
     }
 
