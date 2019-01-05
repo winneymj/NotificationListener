@@ -22,6 +22,7 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.VisibleForTesting;
 
 import java.util.List;
@@ -80,7 +81,7 @@ public abstract class AppDatabase extends RoomDatabase {
 //                    }
 //                })
 //                .addMigrations(MIGRATION_1_2)
-                .allowMainThreadQueries() // For now till I use live queries perhaps
+//                .allowMainThreadQueries() // For now till I use live queries perhaps
                 .build();
     }
 
@@ -98,8 +99,16 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public static void insertData(final List<NotificationAppsEntity> apps) {
-        sInstance.runInTransaction(() -> {
-            sInstance.notificationApps().insertAll(apps);
+        /**
+         *  Insert and get data using Database Async way
+         */
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                //Insert Data
+                sInstance.notificationApps().insertAll(apps);
+            }
         });
     }
 
