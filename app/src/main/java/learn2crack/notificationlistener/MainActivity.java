@@ -23,11 +23,14 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import learn2crack.notificationlistener.persistence.db.AppDatabase;
+
 public class MainActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private AppDatabase mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        mDatabase = AppDatabase.getInstance(getApplicationContext());
     }
 
     private void setupViewPager(ViewPager viewPager) {

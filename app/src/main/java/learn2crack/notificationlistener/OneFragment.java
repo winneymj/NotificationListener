@@ -69,23 +69,12 @@ public class OneFragment extends Fragment{
 
                 TableRow tr = new TableRow(appContext);
                 tr.setLayoutParams(new TableRow.LayoutParams( TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-//                TextView textview = new TextView(appContext);
-//                textview.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT,1.0f));
-//                textview.setTextSize(20);
-//                textview.setTextColor(Color.parseColor("#0B0719"));
-//                textview.setText(Html.fromHtml(pName));
-//                tr.addView(textview);
                 Switch switchView = new Switch(appContext);
                 switchView.setText(Html.fromHtml(pName));
                 switchView.setTextSize(20);
                 switchView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
                 switchView.setPadding(10, 15,0,15);
                 tr.addView(switchView);
-
-//                android:id="@+id/switch1"
-//                android:layout_width="match_parent"
-//                android:layout_height="wrap_content"
-
                 apps.addView(tr);
 
             } catch (PackageManager.NameNotFoundException e)
