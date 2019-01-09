@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -25,7 +26,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.READ_SMS;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,7 +58,21 @@ public class MainActivity extends AppCompatActivity {
 
         // See if we can initialize ble
         ble = new BluetoothImp(getApplicationContext());
-        ble.init(this);
+        boolean bleSupported = ble.verifyBleSupported();
+        if (!bleSupported) {
+            // Output error situation
+        }
+        else {
+            // See if we have permission to use bluetooth.
+            // This is an async dialog so we have to assume
+            // that we will continue after this call without
+            // the user having accepted the permission.
+            if (!ble.checkAndRequestPermissions(this))
+            {
+                // We have permissions so initialise ble here.
+                this.ble.initializeBle(this);
+            }
+        }
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -97,20 +117,24 @@ public class MainActivity extends AppCompatActivity {
      * @param permissions
      * @param grantResults
      */
+    @Override
     public void onRequestPermissionsResult (int requestCode, String[] permissions,
                                             int[] grantResults) {
-        if (permissions.length == 0 || grantResults.length == 0)
-        {
-            Log.i("MainActivity.onRequestPermissionsResult() : denied Permission", "");
+        int index = 0;
+        Map<String, Integer> PermissionsMap = new HashMap<String, Integer>();
+        for (String permission : permissions){
+            PermissionsMap.put(permission, grantResults[index]);
+            index++;
+        }
+
+        if((PermissionsMap.get(Manifest.permission.ACCESS_FINE_LOCATION) != 0)
+                || PermissionsMap.get(Manifest.permission.ACCESS_COARSE_LOCATION) != 0){
+            Toast.makeText(this, "Location permission is a must", Toast.LENGTH_SHORT).show();
+            finish();
         }
         else
         {
-            for (String perm : permissions) {
-                Log.i("MainActivity.onRequestPermissionsResult() : Permission=", perm);
-            }
-            for (int grant : grantResults) {
-                Log.i("MainActivity.onRequestPermissionsResult() : grant=", Integer.toString(grant));
-            }
+            this.ble.initializeBle(this);
         }
     }
 }

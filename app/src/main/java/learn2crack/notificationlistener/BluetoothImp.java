@@ -15,6 +15,7 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,7 +27,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BluetoothImp {
 
@@ -41,6 +44,7 @@ public class BluetoothImp {
 
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
+    private final static int REQUEST_ENABLE_BT = 1;
 
 
     public BluetoothImp(final Context appContext) {
@@ -48,27 +52,8 @@ public class BluetoothImp {
         this.appContext = appContext;
     }
 
-    public Boolean init(AppCompatActivity activity) {
+    public Boolean initializeBle(final AppCompatActivity activity) {
         Log.i("BluetoothImp.init() : enter", "");
-        // Use this check to determine whether BLE is supported on the device. Then
-        // you can selectively disable BLE-related features.
-        if (!this.appContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this.appContext, "BLE is not supported", Toast.LENGTH_SHORT).show();
-            Log.i("BluetoothImp.init() : return false", "");
-            return false;
-        }
-
-        // Request permission from user to access location data so we can use BLE
-        int permissionCheck = ContextCompat.checkSelfPermission(this.appContext, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION)){
-                Toast.makeText(this.appContext, "The permission to get BLE location data is required", Toast.LENGTH_SHORT).show();
-            }else{
-                activity.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            }
-        }else{
-            Toast.makeText(this.appContext, "Location permissions already granted", Toast.LENGTH_SHORT).show();
-        }
 
         // Initializes Bluetooth adapter.
         final BluetoothManager bluetoothManager =
@@ -78,8 +63,8 @@ public class BluetoothImp {
         // Ensures Bluetooth is available on the device and it is enabled. If not,
         // displays a dialog requesting user permission to enable Bluetooth.
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-//            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             Log.i("BluetoothImp.init() : no ble device or not enabled", "");
             return false;
         }
@@ -98,6 +83,58 @@ public class BluetoothImp {
         Log.i("BluetoothImp.init() : exit", "");
 
         return true;
+    }
+
+    public boolean verifyBleSupported()
+    {
+        // Use this check to determine whether BLE is supported on the device. Then
+        // you can selectively disable BLE-related features.
+        if (!this.appContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this.appContext, "BLE is not supported", Toast.LENGTH_SHORT).show();
+            Log.i("BluetoothImp.init() : return false", "");
+            return false;
+        }
+
+        return true;
+    }
+
+//    private void waitForPermission(final AppCompatActivity activity) {
+//
+//        boolean isAnswered = false;
+//
+//        while (!isAnswered) {
+//            if (ActivityCompat.checkSelfPermission(this.appContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+//                    ActivityCompat.checkSelfPermission(this.appContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                Log.d("isanswered", String.valueOf(isAnswered));
+//            } else {
+//                isAnswered = true;
+//                Log.d("isanswered", String.valueOf(isAnswered));
+//            }
+//            android.os.SystemClock.sleep(1000);
+//        }
+//    }
+
+    // Returns true if permissions needed else false if permission
+    // has already been given.
+    public boolean checkAndRequestPermissions(final AppCompatActivity activity) {
+        // Request permission from user to access location data so we can use BLE
+        String[] allPermissionNeeded = {
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION};
+        List<String> permissionNeeded = new ArrayList<>();
+
+        for (String permission : allPermissionNeeded) {
+            if (ContextCompat.checkSelfPermission(this.appContext, permission) != PackageManager.PERMISSION_GRANTED)
+                permissionNeeded.add(permission);
+        }
+
+        // We need to ask for permission
+        if (permissionNeeded.size() > 0) {
+            activity.requestPermissions(permissionNeeded.toArray(new String[0]), 1);
+            return true;
+        }
+
+        return false;
     }
 
     private void scanLeDevice(final boolean enable) {
@@ -130,9 +167,10 @@ public class BluetoothImp {
     private ScanCallback mScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
+            // Callback type 1 = CALLBACK_TYPE_ALL_MATCHES
             Log.i("ScanCallback().onScanResult():callbackType", String.valueOf(callbackType));
             Log.i("result", result.toString());
-            BluetoothDevice btDevice = result.getDevice();
+//            BluetoothDevice btDevice = result.getDevice();
 //            connectToDevice(btDevice);
         }
 
