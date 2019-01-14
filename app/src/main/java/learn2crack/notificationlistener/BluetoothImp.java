@@ -33,6 +33,8 @@ import java.util.Map;
 
 public class BluetoothImp {
 
+    private static final BluetoothImp instance = new BluetoothImp();
+
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
     private Handler mHandler;
@@ -46,13 +48,19 @@ public class BluetoothImp {
     private static final long SCAN_PERIOD = 10000;
     private final static int REQUEST_ENABLE_BT = 1;
 
+    //private constructor to avoid client applications to use constructor
+    private BluetoothImp(){}
 
-    public BluetoothImp(final Context appContext) {
+    public static BluetoothImp getInstance(){
+        return instance;
+    }
+    public void init(final Context appContext) {
 
         this.appContext = appContext;
     }
 
-    public Boolean initializeBle(final AppCompatActivity activity) {
+    public Boolean initializeBle(/*final AppCompatActivity activity*/)
+    {
         Log.i("BluetoothImp.init() : enter", "");
 
         // Initializes Bluetooth adapter.
@@ -62,9 +70,10 @@ public class BluetoothImp {
 
         // Ensures Bluetooth is available on the device and it is enabled. If not,
         // displays a dialog requesting user permission to enable Bluetooth.
-        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled())
+        {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+//            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             Log.i("BluetoothImp.init() : no ble device or not enabled", "");
             return false;
         }
