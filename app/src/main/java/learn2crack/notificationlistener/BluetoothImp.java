@@ -39,7 +39,7 @@ public class BluetoothImp {
     private boolean mScanning;
     private Handler mHandler;
     private BluetoothLeScanner mBleScanner;
-    private Context appContext;
+    private Context mAppContext;
     private ScanSettings settings;
     private List<ScanFilter> filters;
     private BluetoothGatt mGatt;
@@ -51,21 +51,24 @@ public class BluetoothImp {
     //private constructor to avoid client applications to use constructor
     private BluetoothImp(){}
 
-    public static BluetoothImp getInstance(){
+    public static BluetoothImp getInstance()
+    {
         return instance;
-    }
-    public void init(final Context appContext) {
 
-        this.appContext = appContext;
     }
 
-    public Boolean initializeBle(/*final AppCompatActivity activity*/)
+    public void setArguments(final Context appContext)
+    {
+        mAppContext = appContext;
+    }
+
+    public boolean init()
     {
         Log.i("BluetoothImp.init() : enter", "");
 
         // Initializes Bluetooth adapter.
         final BluetoothManager bluetoothManager =
-                (BluetoothManager) this.appContext.getSystemService(Context.BLUETOOTH_SERVICE);
+                (BluetoothManager) mAppContext.getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
 
         // Ensures Bluetooth is available on the device and it is enabled. If not,
@@ -98,9 +101,9 @@ public class BluetoothImp {
     {
         // Use this check to determine whether BLE is supported on the device. Then
         // you can selectively disable BLE-related features.
-        if (!this.appContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this.appContext, "BLE is not supported", Toast.LENGTH_SHORT).show();
-            Log.i("BluetoothImp.init() : return false", "");
+        if (!this.mAppContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+//            Toast.makeText(this.appContext, "BLE is not supported", Toast.LENGTH_SHORT).show();
+//            Log.i("BluetoothImp.init() : return false", "");
             return false;
         }
 
@@ -133,7 +136,7 @@ public class BluetoothImp {
         List<String> permissionNeeded = new ArrayList<>();
 
         for (String permission : allPermissionNeeded) {
-            if (ContextCompat.checkSelfPermission(this.appContext, permission) != PackageManager.PERMISSION_GRANTED)
+            if (ContextCompat.checkSelfPermission(mAppContext, permission) != PackageManager.PERMISSION_GRANTED)
                 permissionNeeded.add(permission);
         }
 
@@ -221,7 +224,7 @@ public class BluetoothImp {
 
     public void connectToDevice(BluetoothDevice device) {
         if (mGatt == null) {
-            mGatt = device.connectGatt(appContext, false, gattCallback);
+            mGatt = device.connectGatt(mAppContext, false, gattCallback);
             scanLeDevice(false);// will stop after first device detection
         }
     }

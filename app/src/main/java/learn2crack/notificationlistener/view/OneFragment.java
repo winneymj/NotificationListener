@@ -26,12 +26,16 @@ import learn2crack.notificationlistener.persistence.db.AppDatabase;
 import learn2crack.notificationlistener.persistence.db.entity.NotificationAppsEntity;
 import learn2crack.notificationlistener.viewmodel.NotifierViewModel;
 
-public class OneFragment extends Fragment{
-
+public class OneFragment extends Fragment
+{
     private TableLayout apps;
     private AppDatabase mDatabase;
     private NotifierViewModel mViewModel;
+    private Context mAppContext;
 
+    /**
+     * Constructor
+     */
     public OneFragment(){};
 
     public void setArguments(final NotifierViewModel viewModel)
@@ -45,13 +49,6 @@ public class OneFragment extends Fragment{
         super.onCreate(savedInstanceState);
     }
 
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        // Inflate the layout for this fragment
-//        return inflater.inflate(R.layout.fragment_one, container, false);
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
@@ -60,16 +57,24 @@ public class OneFragment extends Fragment{
         View v = inflater.inflate(R.layout.fragment_one, container, false);
         apps = v.findViewById(R.id.tab1);
 
-        final Context appContext = getActivity().getApplicationContext();
-        final PackageManager pm = appContext.getPackageManager();
+        mAppContext = getActivity().getApplicationContext();
 
         // Get instance of DB
-        mDatabase = AppDatabase.getInstance(appContext);
+        mDatabase = AppDatabase.getInstance(mAppContext);
 
         // Setup databindings with the viewmodel.
         initDataBindings();
 
+//        // Retrieve the installed apps
+//        getInstalledApps();
 
+        return v;
+    }
+
+//    private void getInstalledApps()
+//    {
+//        final PackageManager pm = mAppContext.getPackageManager();
+//
 //        Intent intent = new Intent(Intent.ACTION_MAIN, null);
 //        intent.addCategory(Intent.CATEGORY_LAUNCHER);
 //        List<ResolveInfo> appList = pm.queryIntentActivities(intent, 0);
@@ -89,9 +94,9 @@ public class OneFragment extends Fragment{
 //                String pName = appInfo.loadLabel(pm).toString();
 //                Log.i("package name:", pName);
 //
-//                TableRow tr = new TableRow(appContext);
+//                TableRow tr = new TableRow(mAppContext);
 //                tr.setLayoutParams(new TableRow.LayoutParams( TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-//                Switch switchView = new Switch(appContext);
+//                Switch switchView = new Switch(mAppContext);
 //                switchView.setText(Html.fromHtml(pName));
 //                switchView.setTextSize(20);
 //                switchView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
@@ -107,11 +112,9 @@ public class OneFragment extends Fragment{
 //                e.printStackTrace();
 //            }
 //        }
-//        // Add apps to DB
-//        mDatabase.insertData(notificationApps);
-
-        return v;
-    }
+////        // Add apps to DB
+////        mDatabase.insertData(notificationApps);
+//    }
 
     private void initDataBindings()
     {
@@ -124,9 +127,13 @@ public class OneFragment extends Fragment{
     }
 
     @VisibleForTesting
-    public void onInstalledAppsChanged(ArrayList<String> appList)
+    public void onInstalledAppsChanged(List<String> appList)
     {
-
+        Log.i("onInstalledAppsChanged:list size=", Integer.toString(appList.size()));
+        for(String appName: appList)
+        {
+            Log.i("onInstalledAppsChanged:list name=", appName);
+        }
     }
 
 }
