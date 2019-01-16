@@ -65,8 +65,8 @@ public class OneFragment extends Fragment
         // Setup databindings with the viewmodel.
         initDataBindings();
 
-//        // Retrieve the installed apps
-//        getInstalledApps();
+        // Retrieve the installed apps
+        mViewModel.getInstalledApps();
 
         return v;
     }
@@ -133,6 +133,19 @@ public class OneFragment extends Fragment
         for(String appName: appList)
         {
             Log.i("onInstalledAppsChanged:list name=", appName);
+
+            // Update the display
+            TableRow tr = new TableRow(mAppContext);
+            tr.setLayoutParams(new TableRow.LayoutParams( TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            Switch switchView = new Switch(mAppContext);
+            switchView.setText(Html.fromHtml(appName));
+            switchView.setTextSize(20);
+            switchView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
+            switchView.setPadding(10, 15,0,15);
+            tr.addView(switchView);
+            apps.addView(tr);
+
+            // TODO - Update database
         }
     }
 

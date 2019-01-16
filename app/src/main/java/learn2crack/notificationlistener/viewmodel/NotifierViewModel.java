@@ -49,8 +49,8 @@ public class NotifierViewModel extends ViewModel
         // Initialize the BLE
         initializeBLE();
 
-        // Load the installed apps
-        getInstalledApps();
+//        // Load the installed apps
+//        getInstalledApps();
     }
 
     private void initializeBLE()
@@ -69,7 +69,7 @@ public class NotifierViewModel extends ViewModel
         }
     }
 
-    private void getInstalledApps()
+    public void getInstalledApps()
     {
         final PackageManager pm = mContext.getPackageManager();
 
