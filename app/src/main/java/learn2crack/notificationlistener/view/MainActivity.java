@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import learn2crack.notificationlistener.R;
+import learn2crack.notificationlistener.model.InstalledAppsModel;
+import learn2crack.notificationlistener.viewmodel.InstalledAppsViewModel;
 import learn2crack.notificationlistener.viewmodel.NotifierViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
-    private NotifierViewModel mViewModel;
+    private InstalledAppsViewModel mAppViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +33,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Get an instance of the view model.
-        mViewModel = ViewModelProviders.of(this).get(NotifierViewModel.class);
-        mViewModel.setArguments(getApplicationContext());
+//        mViewModel = ViewModelProviders.of(this).get(NotifierViewModel.class);
+        mAppViewModel = new InstalledAppsViewModel(new InstalledAppsModel(), getApplicationContext());
+//        mViewModel.setArguments(getApplicationContext());
 
         // Setup the view
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         OneFragment frag1 = new OneFragment();
-        frag1.setArguments(mViewModel); // Pass viewmodel to Fragment
+        frag1.setArguments(mAppViewModel); // Pass viewmodel to Fragment
 
         adapter.addFragment(frag1, "ONE");
         adapter.addFragment(new TwoFragment(), "TWO");

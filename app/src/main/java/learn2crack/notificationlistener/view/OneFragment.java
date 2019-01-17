@@ -24,13 +24,14 @@ import java.util.List;
 import learn2crack.notificationlistener.R;
 import learn2crack.notificationlistener.persistence.db.AppDatabase;
 import learn2crack.notificationlistener.persistence.db.entity.NotificationAppsEntity;
+import learn2crack.notificationlistener.viewmodel.InstalledAppsViewModel;
 import learn2crack.notificationlistener.viewmodel.NotifierViewModel;
 
 public class OneFragment extends Fragment
 {
     private TableLayout apps;
     private AppDatabase mDatabase;
-    private NotifierViewModel mViewModel;
+    private InstalledAppsViewModel mViewModel;
     private Context mAppContext;
 
     /**
@@ -38,7 +39,7 @@ public class OneFragment extends Fragment
      */
     public OneFragment(){};
 
-    public void setArguments(final NotifierViewModel viewModel)
+    public void setArguments(final InstalledAppsViewModel viewModel)
     {
         mViewModel = viewModel;
     }
