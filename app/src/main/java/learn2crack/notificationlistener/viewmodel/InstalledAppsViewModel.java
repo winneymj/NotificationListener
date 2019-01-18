@@ -1,6 +1,7 @@
 package learn2crack.notificationlistener.viewmodel;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.Intent;
@@ -11,16 +12,19 @@ import android.util.Log;
 
 import java.util.List;
 
+import learn2crack.notificationlistener.model.AppDataModel;
 import learn2crack.notificationlistener.model.InstalledAppsModel;
 
 public class InstalledAppsViewModel extends ViewModel
 {
-    private InstalledAppsModel mInstalledAppsModel;
+    private InstalledAppsModel _model;
     private Context mAppContext;
+    private MutableLiveData<List<AppDataModel>> _installedApps = new MutableLiveData<>();
+
 
     public InstalledAppsViewModel(final InstalledAppsModel model, final Context appContext)
     {
-        mInstalledAppsModel = model;
+        _model = model;
         mAppContext = appContext;
     }
 
@@ -48,7 +52,7 @@ public class InstalledAppsViewModel extends ViewModel
                 Log.i("package name:", pName);
 
                 // Save to data model
-                mInstalledAppsModel.setAppName(pName);
+                _model.addApp(pName, appInfo.packageName, false);
 
 //                TableRow tr = new TableRow(mContext);
 //                tr.setLayoutParams(new TableRow.LayoutParams( TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
@@ -70,10 +74,16 @@ public class InstalledAppsViewModel extends ViewModel
         }
 //        // Add apps to DB
 //        mDatabase.insertData(notificationApps);
+        _installedApps.setValue(_model.data());
     }
 
-    public LiveData<List<String>> getAppsList()
+    public LiveData<List<AppDataModel>> getAppsList()
     {
-        return mInstalledAppsModel.getInstalledApps();
+        return _installedApps;
+    }
+
+    public void setAppEnabledState(final String name, final Boolean enabled)
+    {
+        _model.setAppEnabled(name, enabled);
     }
 }

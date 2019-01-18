@@ -1,11 +1,6 @@
 package learn2crack.notificationlistener.view;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
@@ -14,24 +9,23 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import learn2crack.notificationlistener.R;
+import learn2crack.notificationlistener.model.AppDataModel;
 import learn2crack.notificationlistener.persistence.db.AppDatabase;
-import learn2crack.notificationlistener.persistence.db.entity.NotificationAppsEntity;
 import learn2crack.notificationlistener.viewmodel.InstalledAppsViewModel;
-import learn2crack.notificationlistener.viewmodel.NotifierViewModel;
 
 public class OneFragment extends Fragment
 {
     private TableLayout apps;
     private AppDatabase mDatabase;
-    private InstalledAppsViewModel mViewModel;
+    private InstalledAppsViewModel _viewModel;
     private Context mAppContext;
 
     /**
@@ -39,9 +33,8 @@ public class OneFragment extends Fragment
      */
     public OneFragment(){};
 
-    public void setArguments(final InstalledAppsViewModel viewModel)
-    {
-        mViewModel = viewModel;
+    public void setArguments(final InstalledAppsViewModel viewModel) {
+        _viewModel = viewModel;
     }
 
     @Override
@@ -67,7 +60,7 @@ public class OneFragment extends Fragment
         initDataBindings();
 
         // Retrieve the installed apps
-        mViewModel.getInstalledApps();
+        _viewModel.getInstalledApps();
 
         return v;
     }
@@ -124,22 +117,34 @@ public class OneFragment extends Fragment
 
     private void setUpInstalledAppsListener()
     {
-        mViewModel.getAppsList().observe(this, this::onInstalledAppsChanged);
+        _viewModel.getAppsList().observe(this, this::onInstalledAppsChanged);
     }
 
     @VisibleForTesting
-    public void onInstalledAppsChanged(List<String> appList)
+    public void onInstalledAppsChanged(List<AppDataModel> appModels)
     {
-        Log.i("onInstalledAppsChanged:list size=", Integer.toString(appList.size()));
-        for(String appName: appList)
+        Log.i("onInstalledAppsChanged:list size=", Integer.toString(appModels.size()));
+        for(AppDataModel appModel: appModels)
         {
-            Log.i("onInstalledAppsChanged:list name=", appName);
-
             // Update the display
             TableRow tr = new TableRow(mAppContext);
             tr.setLayoutParams(new TableRow.LayoutParams( TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
             Switch switchView = new Switch(mAppContext);
-            switchView.setText(Html.fromHtml(appName));
+
+            switchView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    // do something, the isChecked will be
+                    // true if the switch is in the On position
+                    Log.i("onCheckedChanged:mText=", buttonView.getText().toString());
+                    Log.i("onCheckedChanged:isChecked=",Boolean.toString(isChecked));
+
+                    // Call the viewmodel to set the value.
+                    _viewModel.setAppEnabledState(buttonView.getText().toString(), isChecked);
+
+                }
+            });
+
+            switchView.setText(Html.fromHtml(appModel.name()));
             switchView.setTextSize(20);
             switchView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
             switchView.setPadding(10, 15,0,15);
