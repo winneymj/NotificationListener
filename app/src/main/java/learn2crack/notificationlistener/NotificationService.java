@@ -3,6 +3,7 @@ package learn2crack.notificationlistener;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -14,15 +15,19 @@ public class NotificationService extends NotificationListenerService {
     Context context;
 
     @Override
+    public IBinder onBind(Intent intent) {
+        return super.onBind(intent);
+    }
 
+    @Override
     public void onCreate() {
 
         super.onCreate();
         context = getApplicationContext();
 
     }
-    @Override
 
+    @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
 
 

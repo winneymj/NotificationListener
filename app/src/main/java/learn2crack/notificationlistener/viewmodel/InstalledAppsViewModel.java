@@ -53,20 +53,6 @@ public class InstalledAppsViewModel extends ViewModel
 
                 // Save to data model
                 _model.addApp(pName, appInfo.packageName, false);
-
-//                TableRow tr = new TableRow(mContext);
-//                tr.setLayoutParams(new TableRow.LayoutParams( TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
-//                Switch switchView = new Switch(mContext);
-//                switchView.setText(Html.fromHtml(pName));
-//                switchView.setTextSize(20);
-//                switchView.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f));
-//                switchView.setPadding(10, 15,0,15);
-//                tr.addView(switchView);
-////                apps.addView(tr);
-
-//                NotificationAppsEntity ent = new NotificationAppsEntity(index++, pName, appInfo.packageName, true);
-//                notificationApps.add(ent);
-
             } catch (PackageManager.NameNotFoundException e)
             {
                 e.printStackTrace();
