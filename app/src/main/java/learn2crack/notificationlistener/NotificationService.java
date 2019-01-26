@@ -32,10 +32,12 @@ public class NotificationService extends NotificationListenerService {
 
 
         String pack = sbn.getPackageName();
-        String ticker = sbn.getNotification().tickerText.toString();
+        CharSequence cs = sbn.getNotification().tickerText;
+        String ticker = (null != cs) ? cs.toString() : "";
         Bundle extras = sbn.getNotification().extras;
         String title = extras.getString("android.title");
-        String text = extras.getCharSequence("android.text").toString();
+        cs = extras.getCharSequence("android.text");
+        String text = (null != cs) ? cs.toString() : "";
 
         Log.i("Package",pack);
         Log.i("Ticker",ticker);
@@ -50,7 +52,9 @@ public class NotificationService extends NotificationListenerService {
 
         LocalBroadcastManager.getInstance(context).sendBroadcast(msgrcv);
 
-
+        // Send notification to the BLE service to send the message to remote device.
+        Intent intent = new Intent(this, BluetoothLEService2.class);
+        startService(intent);
     }
 
     @Override

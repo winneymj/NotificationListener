@@ -12,12 +12,12 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Map;
 
-import learn2crack.notificationlistener.BluetoothImp;
+import learn2crack.notificationlistener.BluetoothLeService;
 import learn2crack.notificationlistener.R;
 
 public class TwoFragment extends Fragment{
 
-    private BluetoothImp ble;
+    private BluetoothLeService ble;
 
     public TwoFragment() {
         // Required empty public constructor
@@ -32,7 +32,7 @@ public class TwoFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-//        ble = BluetoothImp.getInstance();
+//        ble = BluetoothLeService.getInstance();
 //        boolean bleSupported = ble.verifyBleSupported();
 //        if (!bleSupported) {
 //            // Output error situation

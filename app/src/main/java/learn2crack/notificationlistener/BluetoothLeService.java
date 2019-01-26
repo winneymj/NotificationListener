@@ -1,6 +1,7 @@
 package learn2crack.notificationlistener;
 
 import android.Manifest;
+import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -17,23 +18,22 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
+import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class BluetoothImp {
+public class BluetoothLeService extends Service {
 
-    private static final BluetoothImp instance = new BluetoothImp();
+    public final static String ACTION_GATT_SERVICES_DISCOVERED =
+            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
+
+    private static final BluetoothLeService instance = new BluetoothLeService();
 
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -49,9 +49,16 @@ public class BluetoothImp {
     private final static int REQUEST_ENABLE_BT = 1;
 
     //private constructor to avoid client applications to use constructor
-    private BluetoothImp(){}
+    private BluetoothLeService(){}
 
-    public static BluetoothImp getInstance()
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+
+
+    public static BluetoothLeService getInstance()
     {
         return instance;
 
@@ -64,7 +71,7 @@ public class BluetoothImp {
 
     public boolean init()
     {
-        Log.i("BluetoothImp.init() : enter", "");
+        Log.i("BluetoothLeService.init() : enter", "");
 
         // Initializes Bluetooth adapter.
         final BluetoothManager bluetoothManager =
@@ -75,9 +82,9 @@ public class BluetoothImp {
         // displays a dialog requesting user permission to enable Bluetooth.
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled())
         {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 //            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            Log.i("BluetoothImp.init() : no ble device or not enabled", "");
+            Log.i("BluetoothLeService.init() : no ble device or not enabled", "");
             return false;
         }
 
@@ -92,7 +99,7 @@ public class BluetoothImp {
         mHandler = new Handler();
         scanLeDevice(true);
 
-        Log.i("BluetoothImp.init() : exit", "");
+        Log.i("BluetoothLeService.init() : exit", "");
 
         return true;
     }
@@ -103,52 +110,36 @@ public class BluetoothImp {
         // you can selectively disable BLE-related features.
         if (!this.mAppContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 //            Toast.makeText(this.appContext, "BLE is not supported", Toast.LENGTH_SHORT).show();
-//            Log.i("BluetoothImp.init() : return false", "");
+//            Log.i("BluetoothLeService.init() : return false", "");
             return false;
         }
 
         return true;
     }
 
-//    private void waitForPermission(final AppCompatActivity activity) {
+//    // Returns true if permissions needed else false if permission
+//    // has already been given.
+//    public boolean checkAndRequestPermissions(final AppCompatActivity activity) {
+//        // Request permission from user to access location data so we can use BLE
+//        String[] allPermissionNeeded = {
+//                Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION};
+//        List<String> permissionNeeded = new ArrayList<>();
 //
-//        boolean isAnswered = false;
-//
-//        while (!isAnswered) {
-//            if (ActivityCompat.checkSelfPermission(this.appContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-//                    ActivityCompat.checkSelfPermission(this.appContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//                Log.d("isanswered", String.valueOf(isAnswered));
-//            } else {
-//                isAnswered = true;
-//                Log.d("isanswered", String.valueOf(isAnswered));
-//            }
-//            android.os.SystemClock.sleep(1000);
+//        for (String permission : allPermissionNeeded) {
+//            if (ContextCompat.checkSelfPermission(mAppContext, permission) != PackageManager.PERMISSION_GRANTED)
+//                permissionNeeded.add(permission);
 //        }
+//
+//        // We need to ask for permission
+//        if (permissionNeeded.size() > 0) {
+//            activity.requestPermissions(permissionNeeded.toArray(new String[0]), 1);
+//            return true;
+//        }
+//
+//        return false;
 //    }
-
-    // Returns true if permissions needed else false if permission
-    // has already been given.
-    public boolean checkAndRequestPermissions(final AppCompatActivity activity) {
-        // Request permission from user to access location data so we can use BLE
-        String[] allPermissionNeeded = {
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION};
-        List<String> permissionNeeded = new ArrayList<>();
-
-        for (String permission : allPermissionNeeded) {
-            if (ContextCompat.checkSelfPermission(mAppContext, permission) != PackageManager.PERMISSION_GRANTED)
-                permissionNeeded.add(permission);
-        }
-
-        // We need to ask for permission
-        if (permissionNeeded.size() > 0) {
-            activity.requestPermissions(permissionNeeded.toArray(new String[0]), 1);
-            return true;
-        }
-
-        return false;
-    }
-
+//
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             mHandler.postDelayed(new Runnable() {
@@ -182,8 +173,8 @@ public class BluetoothImp {
             // Callback type 1 = CALLBACK_TYPE_ALL_MATCHES
             Log.i("ScanCallback().onScanResult():callbackType", String.valueOf(callbackType));
             Log.i("result", result.toString());
-//            BluetoothDevice btDevice = result.getDevice();
-//            connectToDevice(btDevice);
+            BluetoothDevice btDevice = result.getDevice();
+            connectToDevice(btDevice);
         }
 
         @Override
@@ -249,10 +240,39 @@ public class BluetoothImp {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            List<BluetoothGattService> services = gatt.getServices();
-            Log.i("onServicesDiscovered", services.toString());
-            gatt.readCharacteristic(services.get(1).getCharacteristics().get
-                    (0));
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+
+                for (BluetoothGattService gattService : gatt.getServices()) {
+                    Log.i("onServicesDiscovered", "onServicesDiscovered: ---------------------");
+                    Log.i("onServicesDiscovered", "onServicesDiscovered: service=" + gattService.getUuid());
+                    for (BluetoothGattCharacteristic characteristic : gattService.getCharacteristics()) {
+                        Log.i("onServicesDiscovered", "onServicesDiscovered: characteristic=" + characteristic.getUuid());
+
+                        if (characteristic.getUuid().toString().equals("0000ffe9-0000-1000-8000-00805f9b34fb")) {
+
+                            Log.w("onServicesDiscovered", "onServicesDiscovered: found LED");
+
+                            String originalString = "560D0F0600F0AA";
+
+                            byte[] b = hexStringToByteArray(originalString);
+
+                            characteristic.setValue(b); // call this BEFORE(!) you 'write' any stuff to the server
+                            gatt.writeCharacteristic(characteristic);
+
+                            Log.i("onServicesDiscovered", "onServicesDiscovered: , write bytes?! " + bytesToHexStr(b));
+                        }
+                    }
+                }
+
+                broadcastUpdate(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+            } else {
+                Log.w("onServicesDiscovered", "onServicesDiscovered received: " + status);
+            }
+
+//            List<BluetoothGattService> services = gatt.getServices();
+//            Log.i("onServicesDiscovered", services.toString());
+//            gatt.readCharacteristic(services.get(1).getCharacteristics().get
+//                    (0));
         }
 
         @Override
@@ -263,5 +283,31 @@ public class BluetoothImp {
             gatt.disconnect();
         }
     };
+
+    private void broadcastUpdate(final String action) {
+        final Intent intent = new Intent(action);
+        sendBroadcast(intent);
+    }
+
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                    + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHexStr(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
 }
 

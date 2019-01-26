@@ -11,4 +11,8 @@
     <string name="notification_listener_service_explanation">"For the the app. to work you need to enable the Notification Listener Service. Enable it now?"</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+    <string name="bluetooth_enable_explanation">"For the the app. to work you need to enable Bluetooth. Enable it now?"</string>
+    <string name="location_enable_explanation">"For the the app. to work you need to enable Location services. Enable it now?"</string>
+
 </resources>
