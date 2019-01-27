@@ -65,17 +65,17 @@ public class MainActivity extends AppCompatActivity {
             enableBluetoothAlertDialog.show();
         }
 
-//        // If the user did not turn the notification listener service on we prompt him to do so
-//        if(!isNotificationServiceEnabled()){
-//            enableNotificationListenerAlertDialog = buildNotificationServiceAlertDialog();
-//            enableNotificationListenerAlertDialog.show();
-//        }
-//
-//        List<String> permissions = isLocationPermissionsEnabled();
-//        if (permissions.size() > 0)
-//        {
-//            requestPermissions(permissions.toArray(new String[0]), 1);
-//        }
+        // If the user did not turn the notification listener service on we prompt him to do so
+        if(!isNotificationServiceEnabled()){
+            enableNotificationListenerAlertDialog = buildNotificationServiceAlertDialog();
+            enableNotificationListenerAlertDialog.show();
+        }
+
+        List<String> permissions = isLocationPermissionsEnabled();
+        if (permissions.size() > 0)
+        {
+            requestPermissions(permissions.toArray(new String[0]), 1);
+        }
 
         setContentView(R.layout.activity_main);
         // Get an instance of the view model.
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
 
         // See if we can initialize ble
-//        ble = BluetoothLeService.getInstance();
+//        ble = BluetoothHelper.getInstance();
 //        ble.init(getApplicationContext()); // Only need to do once.
     }
 

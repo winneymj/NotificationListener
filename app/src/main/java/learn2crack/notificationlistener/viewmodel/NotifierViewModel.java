@@ -5,7 +5,7 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
-import learn2crack.notificationlistener.BluetoothLeService;
+import learn2crack.notificationlistener.BluetoothHelper;
 import learn2crack.notificationlistener.model.InstalledAppsModel;
 //import android.databinding.ObservableField;
 
@@ -14,7 +14,7 @@ public class NotifierViewModel extends ViewModel
     // Our datamodel
     private InstalledAppsModel mInstalledAppsModel;
     private Context mContext;
-    private BluetoothLeService ble;
+    private BluetoothHelper ble;
 
     // Required
     public NotifierViewModel() {};
@@ -44,7 +44,7 @@ public class NotifierViewModel extends ViewModel
     private void initializeBLE()
     {
         // See if we can initialize ble
-        ble = BluetoothLeService.getInstance();
+        ble = BluetoothHelper.getInstance();
         ble.setArguments(mContext);
         if (ble.verifyBleSupported())
         {
@@ -53,7 +53,7 @@ public class NotifierViewModel extends ViewModel
         else
         {
             Toast.makeText(mContext, "BLE is not supported", Toast.LENGTH_SHORT).show();
-            Log.i("BluetoothLeService.init() : return false", "");
+            Log.i("BluetoothHelper.init() : return false", "");
         }
     }
 

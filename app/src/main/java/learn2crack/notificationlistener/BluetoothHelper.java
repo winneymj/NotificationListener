@@ -1,7 +1,5 @@
 package learn2crack.notificationlistener;
 
-import android.Manifest;
-import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -21,19 +19,17 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BluetoothLeService extends Service {
+public class BluetoothHelper {
 
     public final static String ACTION_GATT_SERVICES_DISCOVERED =
             "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
 
-    private static final BluetoothLeService instance = new BluetoothLeService();
+    private static final BluetoothHelper instance = new BluetoothHelper();
 
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -49,16 +45,9 @@ public class BluetoothLeService extends Service {
     private final static int REQUEST_ENABLE_BT = 1;
 
     //private constructor to avoid client applications to use constructor
-    private BluetoothLeService(){}
+    private BluetoothHelper(){}
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-
-    public static BluetoothLeService getInstance()
+    public static BluetoothHelper getInstance()
     {
         return instance;
 
@@ -71,7 +60,7 @@ public class BluetoothLeService extends Service {
 
     public boolean init()
     {
-        Log.i("BluetoothLeService.init() : enter", "");
+        Log.i("BluetoothHelper.init() : enter", "");
 
         // Initializes Bluetooth adapter.
         final BluetoothManager bluetoothManager =
@@ -84,7 +73,7 @@ public class BluetoothLeService extends Service {
         {
 //            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 //            activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            Log.i("BluetoothLeService.init() : no ble device or not enabled", "");
+            Log.i("BluetoothHelper.init() : no ble device or not enabled", "");
             return false;
         }
 
@@ -99,7 +88,7 @@ public class BluetoothLeService extends Service {
         mHandler = new Handler();
         scanLeDevice(true);
 
-        Log.i("BluetoothLeService.init() : exit", "");
+        Log.i("BluetoothHelper.init() : exit", "");
 
         return true;
     }
@@ -110,7 +99,7 @@ public class BluetoothLeService extends Service {
         // you can selectively disable BLE-related features.
         if (!this.mAppContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 //            Toast.makeText(this.appContext, "BLE is not supported", Toast.LENGTH_SHORT).show();
-//            Log.i("BluetoothLeService.init() : return false", "");
+//            Log.i("BluetoothHelper.init() : return false", "");
             return false;
         }
 
@@ -174,7 +163,11 @@ public class BluetoothLeService extends Service {
             Log.i("ScanCallback().onScanResult():callbackType", String.valueOf(callbackType));
             Log.i("result", result.toString());
             BluetoothDevice btDevice = result.getDevice();
-            connectToDevice(btDevice);
+            String devName = btDevice.getName();
+            if (null != devName) {
+                Log.i("ScanCallback().onScanResult():devName=", devName);
+                connectToDevice(btDevice);
+            }
         }
 
         @Override
@@ -240,19 +233,20 @@ public class BluetoothLeService extends Service {
 
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
+            super.onServicesDiscovered(gatt, status);
 
+            if (status == BluetoothGatt.GATT_SUCCESS) {
                 for (BluetoothGattService gattService : gatt.getServices()) {
                     Log.i("onServicesDiscovered", "onServicesDiscovered: ---------------------");
                     Log.i("onServicesDiscovered", "onServicesDiscovered: service=" + gattService.getUuid());
                     for (BluetoothGattCharacteristic characteristic : gattService.getCharacteristics()) {
                         Log.i("onServicesDiscovered", "onServicesDiscovered: characteristic=" + characteristic.getUuid());
 
-                        if (characteristic.getUuid().toString().equals("0000ffe9-0000-1000-8000-00805f9b34fb")) {
+                        if (characteristic.getUuid().toString().equals("0000a001-0000-1000-8000-00805f9b34fb")) {
 
                             Log.w("onServicesDiscovered", "onServicesDiscovered: found LED");
 
-                            String originalString = "560D0F0600F0AA";
+                            String originalString = "00";
 
                             byte[] b = hexStringToByteArray(originalString);
 
@@ -264,7 +258,7 @@ public class BluetoothLeService extends Service {
                     }
                 }
 
-                broadcastUpdate(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+//                broadcastUpdate(BluetoothHelper.ACTION_GATT_SERVICES_DISCOVERED);
             } else {
                 Log.w("onServicesDiscovered", "onServicesDiscovered received: " + status);
             }
@@ -284,10 +278,10 @@ public class BluetoothLeService extends Service {
         }
     };
 
-    private void broadcastUpdate(final String action) {
-        final Intent intent = new Intent(action);
-        sendBroadcast(intent);
-    }
+//    private void broadcastUpdate(final String action) {
+//        final Intent intent = new Intent(action);
+//        sendBroadcast(intent);
+//    }
 
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
